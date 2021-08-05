@@ -38,35 +38,11 @@ let panelOutside = false;
 // Adding event listener to the button to pop out features panel
 drag.addEventListener('click', () => {
     if(panelOutside) {
-        panel.style = `
-            width: 350px;
-            height: 400px;
-            display: flex;
-            justify-content: center;
-            background:white;
-            align-items: center;
-            position: fixed;
-            top: 50px;
-            left: -500px;
-            transition: 0.5s all ease;
-            z-index: 1000;
-        `
+        panel.style.left = "-500px";
         panelOutside = false;
     }
     else {
-        panel.style = `
-                width: 350px;
-                height: 400px;
-                display: flex;
-                justify-content: center;
-                background:white;
-                align-items: center;
-                position: fixed;
-                top: 50px;
-                left: 10px;
-                transition: 0.5s all ease;
-                z-index: 1000;
-            `
+        panel.style.left = "10px";
         panelOutside = true;
     }
 })
@@ -79,31 +55,60 @@ drag.addEventListener('click', () => {
 // Creating Panel for different features
 const panel = document.createElement("div");
 panel.innerHTML =   `
-                    <div class="row1"> 
+                    <h4>Color Adjustments</h4>
+                    <div class="row" style="display:flex; justify-content: center; user-select: none;"> 
                         <div id="darkHigh" class="options" > Dark High-Contrast </div>
                         <div id="brightHigh" class="options"> Bright High-contrast</div>
                     </div>
-                    <div class="row2"> 
+                    <div class="row" style="display:flex; justify-content: center; user-select: none;"> 
                         <div id="monochrome" class="options"> Monochrome </div>
                         <div id="contrast" class="options"> Contrast Mode</div>
                     </div>
+                    <div style="width: 100%; text-align: center; user-select: none;">
+                        <h4>Content Adjustment</h4>
+                        <div class="contextAdjustment" 
+                            style=" display: flex;
+                                    width: 80%;
+                                    margin: 0 auto;
+                                    ">
+                            <div class="smallText" 
+                                style="flex:0.075; background:blue; color: white; text-align:center; border-radius: 50%;
+                                        font-size: 1.25rem; cursor:pointer;"
+                                > - </div> 
+                            <div class="outerBar" style="flex:0.8;background: green;border-radius: 20px; margin: 0 5px;">
+                                <div style="width: 25%;background: grey;border-radius: 20px;height: 21px;transition: 0.2s all ease;" class="innerBar"></div>
+                            </div> 
+                            <div class="largeText" 
+                                style=" flex: 0.075;
+                                        background: blue;
+                                        text-align: center;
+                                        color: white;
+                                        border-radius: 50%;
+                                        font-size: 1.25rem;
+                                        cursor: pointer;"
+                                        > + </div> 
+                            </div>
+                        </div>
                     `
 html.prepend(panel);
 
 // Adding styles to the panel
 panel.style =   `
                 width: 400px;
-                height: 400px;
+                height: 600px;
                 display: flex;
-                justify-content: center;
-                background:white;
+                flex-direction: column;
+                // justify-content: center;
+                background: rgb(255,255,255);
+                background: radial-gradient(circle, rgba(255,255,255,1) 14%, rgba(217,236,244,1) 100%);
                 align-items: center;
                 position: fixed;
-                top: 50px;
+                top: 10px;
                 left: -500px;
                 transition: 0.5s all ease;
                 z-index: 1000;
                 border-radius: 10px;
+                padding-top: 30px;
                 `
 
 // Adding styles to all the 4 options created till now
@@ -123,13 +128,14 @@ AllOptions.forEach(each => {
         `
 });
 
-// ----------------------------->>>> Handling events of all features <<<<-----------------------------
+// ----------------------------->>>> Handling events of 4 Color Adjustments features <<<<-----------------------------
 
-const changeEverything = (background, text) => {
+const changeColors = (background, text) => {
     const allDivs = document.querySelectorAll("div")
     const allMains = document.querySelectorAll("main")
     const allSections = document.querySelectorAll("section")
     const allSvgs = document.querySelectorAll("svg")
+    const allSpans = document.querySelectorAll("span")
 
     allDivs.forEach((eachDiv) => {
         if(!eachDiv.classList.contains("panel")) {
@@ -151,26 +157,71 @@ const changeEverything = (background, text) => {
             eachSvg.style.background = text;
         }
     })
+
+
+    allSpans.forEach(eachSpan => {
+        // eachSpan.style.background = background;
+        eachSpan.style.color = text
+    });
 }
 
 //  Bright High-Contrast
 document.getElementById("brightHigh").addEventListener("click", () => {
-    changeEverything("white", "black");
+    changeColors("white", "black");
 })
 
 // Dark High-Contrast
 document.getElementById("darkHigh").addEventListener("click", () => {
-    changeEverything("black", "white");
+    changeColors("black", "white");
 })
 
 // Monochrome
 document.getElementById("monochrome").addEventListener("click", () => {
-    changeEverything("grey", "white");
+    changeColors("grey", "white");
 })
 
 
 
 
+// ----------------------------->>>> Handling events of Content Adjustments features <<<<-----------------------------
+const outerBar = document.querySelector(".outerBar");
+const innerBar = document.querySelector(".innerBar");
+
+const smallText = document.querySelector(".smallText");
+const largeText = document.querySelector(".largeText");
+
+const changeText = (change) => {
+    const allDivs = document.querySelectorAll("div")
+    const allMains = document.querySelectorAll("main")
+    const allSections = document.querySelectorAll("section")
+    const allSpans = document.querySelectorAll("span")
+
+    allSpans.forEach(eachSpan => {
+        const currentSize = parseInt(getComputedStyle(eachSpan).fontSize);
+        let finalSize;
+        if(change === "small") {
+            finalSize = currentSize/1.25;
+        }
+        else if(change === "large") {
+            finalSize = currentSize*1.25;
+        }
+        eachSpan.style.fontSize = finalSize.toString()+"px";
+    });
+}
 
 
+smallText.addEventListener('click', ()=> {
+    if(innerBar.style.width !== "25%") {
+        let finalWidth = parseInt(innerBar.style.width)-25;
+        innerBar.style.width = finalWidth.toString()+"%";
+        changeText("small");
+    }
+})
 
+largeText.addEventListener('click', ()=> {
+    if(innerBar.style.width !== "100%") {
+        let finalWidth = parseInt(innerBar.style.width)+25;
+        innerBar.style.width = finalWidth.toString()+"%";
+        changeText("large");
+    }
+})
